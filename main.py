@@ -64,6 +64,12 @@ def image_processing(image):
     # kernel = np.ones((3, 3), np.uint8)
     # image = cv2.dilate(image, kernel, iterations=3)
     # image = cv2.erode(image, kernel, iterations=4)
+
+    contours, hierarchy = cv2.findContours(image, 1, 2)
+    cv2.drawContours(image, contours, -1, (255, 255, 0), 3)
+    kernel = np.ones((3, 3), np.uint8)
+    image = cv2.dilate(image, kernel, iterations=1)
+    image = cv2.erode(image, kernel, iterations=1)
     return image
 
 

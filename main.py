@@ -82,12 +82,11 @@ def image_processing(path):
     return cv2.bitwise_and(image, mask)
 
 
-def normalize(image):
-    checker = lambda x: 1 if x > 0 else 0
-    return None  # TODO ^ to na elemantach arrayu wykonać i go zwrocić
+def norm(image): return [list(map(int, row / 255)) for row in list(cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)[1])]
 
 
 def evaluation(processed, actual):
+    print(norm(processed))
     # TODO trafność // trafność jest dziwna - nie jest wartością, czułość i swoistość są jej miarami
     # TODO https://pqstat.pl/?mod_f=diagnoza
     # TODO naczynie - positive, tło - negative
@@ -103,5 +102,5 @@ paths = get_paths('pictures')
 test_image = image_processing(paths[-1][0])
 # show_image(test_image)
 actual_image = read_image(paths[-1][1], cv2.IMREAD_GRAYSCALE, 800)
-show_image(actual_image)
+# show_image(actual_image)
 evaluation(test_image, actual_image)

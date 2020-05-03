@@ -3,6 +3,7 @@ import matplotlib
 import cv2
 from os import listdir
 from os.path import isfile, join
+import sys
 
 
 def get_paths(dir_name):
@@ -32,16 +33,22 @@ def get_paths(dir_name):
     return [[pic.original_path, pic.target_paths] for pic in picture_list]
 
 
-def show_image(image):
-    cv2.imshow('image', image)
-    cv2.waitKey(0)
-
-
 def resize(image, width):
     (h, w) = image.shape[:2]
     ratio = w / width
     height = int(np.round(h / ratio))
     return cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+
+
+def read_image(path, method, size):
+    image = cv2.imread(path, method)
+    image = resize(image, size)
+    return image
+
+
+def show_image(image):
+    cv2.imshow('image', image)
+    cv2.waitKey(0)
 
 
 def adjust_gamma(image, gamma):
@@ -51,29 +58,50 @@ def adjust_gamma(image, gamma):
     return cv2.LUT(image, table)
 
 
-def image_processing(image):
-    # tu trzeba coś fajnego odjebać
+def image_processing(path):
+    image = read_image(path, cv2.IMREAD_COLOR, 800)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    image = resize(image, 800)  # resize bo wysoka rozdzielczcośc to tylko problemy XD
+    image = resize(image, 800)
     image = adjust_gamma(image, 1.07)
     image = cv2.GaussianBlur(image, (3, 3), 0)
     high_threshold, _ = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     high_threshold *= 0.75
     low_threshold = high_threshold / 2
     image = cv2.Canny(image, low_threshold, high_threshold)
-    # kernel = np.ones((3, 3), np.uint8)
-    # image = cv2.dilate(image, kernel, iterations=3)
-    # image = cv2.erode(image, kernel, iterations=4)
-
     contours, hierarchy = cv2.findContours(image, 1, 2)
     cv2.drawContours(image, contours, -1, (255, 255, 0), 3)
     kernel = np.ones((3, 3), np.uint8)
     image = cv2.dilate(image, kernel, iterations=1)
     image = cv2.erode(image, kernel, iterations=1)
-    return image
+    ##############################################################
+    mask_path = '.\\pictures\\healthy_fovmask\\15_h_mask.tif'  # TODO adresowanie tego ładnie jak inne
+    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+    mask = resize(mask, 800)
+    mask = cv2.erode(mask, kernel, iterations=3)
+    #############################################################
+    return cv2.bitwise_and(image, mask)
+
+
+def normalize(image):
+    checker = lambda x: 1 if x > 0 else 0
+    return None  # TODO ^ to na elemantach arrayu wykonać i go zwrocić
+
+
+def evaluation(processed, actual):
+    # TODO trafność // trafność jest dziwna - nie jest wartością, czułość i swoistość są jej miarami
+    # TODO https://pqstat.pl/?mod_f=diagnoza
+    # TODO naczynie - positive, tło - negative
+    accuracy = None  # wiec to chyba nieprzydatne
+    # TODO czułość TP/(TP+FN)
+    sensitivity = None
+    # TODO swoistość TN/(FP+TN)
+    specificity = None
+    # TODO miary dla danych niezrównoważonych
 
 
 paths = get_paths('pictures')
-test_image = cv2.imread(paths[-1][0], cv2.IMREAD_COLOR)  # healthy -> 15_h
-test_image = image_processing(test_image)
-show_image(test_image)
+test_image = image_processing(paths[-1][0])
+# show_image(test_image)
+actual_image = read_image(paths[-1][1], cv2.IMREAD_GRAYSCALE, 800)
+show_image(actual_image)
+evaluation(test_image, actual_image)

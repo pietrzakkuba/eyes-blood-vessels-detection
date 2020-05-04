@@ -61,4 +61,23 @@ class Picture:
         cv2.imshow('target', image)
         cv2.waitKey(0)
 
+    @staticmethod
+    def cutMiddleSquare(image):
+        h, w = image.shape
+        hcut = int((h - 2048) / 2)
+        wcut = int((w - 2048) / 2)
+        return image[hcut:h - hcut, wcut:w - wcut]
 
+    @staticmethod
+    def cutIntoSquares(image, squareSize=1024):
+        div = int(2048 / squareSize)
+        squares = []
+        for i in range(div):
+            for j in range(div):
+                squares.append(image[i * squareSize:(i + 1) * squareSize, j * squareSize:(j + 1) * squareSize])
+        for i in range(len(squares)):
+            squares = [cv2.resize(square, (256, 256)) for square in squares]
+            cv2.putText(squares[i], str(i), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2,
+                        cv2.LINE_AA)
+            cv2.imshow(str(i), squares[i])
+        return squares

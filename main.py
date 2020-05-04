@@ -6,32 +6,47 @@ from os.path import isfile, join
 import sys
 
 
-def get_paths(dir_name):
-    # zamknąłem Twoje rzeczy w funkcji
-    # spoko to zrobiłeś
-    # nie chce mi się tego próbować zrozumieć, ale działa gitówa XD
-    class Picture:
-        def __init__(self, original_path, target_paths):
-            self.original_path = original_path
-            self.target_paths = target_paths
+class Picture:
+    def __init__(self, original_path, target_path):
+        self.original_path = original_path
+        self.target_path = target_path
 
-    dir_list = [join(dir_name, f) for f in listdir(dir_name)]
-    dir_list = [x for x in dir_list if 'fovmask' not in x][:-1]
+# def get_paths(dir_name):
+#     # zamknąłem Twoje rzeczy w funkcji
+#     # spoko to zrobiłeś
+#     # nie chce mi się tego próbować zrozumieć, ale działa gitówa XD
+#
+#
+#     dir_list = [join(dir_name, f) for f in listdir(dir_name)]
+#     dir_list = [x for x in dir_list if 'fovmask' not in x][:-1]
+#
+#     picture_list = []
+#
+#     loc_dir_list = [join(dir_list[0], f) for f in listdir(dir_list[0])]
+#     for i in range(0, len(loc_dir_list), 3):
+#         picture_list.append(Picture(loc_dir_list[i], [loc_dir_list[i + 1], loc_dir_list[i + 2]]))
+#
+#     for i in range(1, len(dir_list) - 1, 2):
+#         loc_dir_list = [[join(dir_list[i], f) for f in listdir(dir_list[i])],
+#                         [join(dir_list[i + 1], f) for f in listdir(dir_list[i + 1])]]
+#         for j in range(len(loc_dir_list[0])):
+#             picture_list.append(Picture(loc_dir_list[0][j], loc_dir_list[1][j]))
+#
+#     return [[pic.original_path, pic.target_paths] for pic in picture_list]
 
-    picture_list = []
+def getPaths():
+    healthy='pictures\healthy'
+    healthymanual='pictures\healthy_manualsegm'
+    pictures=[]
 
-    loc_dir_list = [join(dir_list[0], f) for f in listdir(dir_list[0])]
-    for i in range(0, len(loc_dir_list), 3):
-        picture_list.append(Picture(loc_dir_list[i], [loc_dir_list[i + 1], loc_dir_list[i + 2]]))
-
-    for i in range(1, len(dir_list) - 1, 2):
-        loc_dir_list = [[join(dir_list[i], f) for f in listdir(dir_list[i])],
-                        [join(dir_list[i + 1], f) for f in listdir(dir_list[i + 1])]]
-        for j in range(len(loc_dir_list[0])):
-            picture_list.append(Picture(loc_dir_list[0][j], loc_dir_list[1][j]))
-
-    return [[pic.original_path, pic.target_paths] for pic in picture_list]
-
+    healthy_paths=[join(healthy, f) for f in listdir(healthy)]
+    healthymanual_paths = [join(healthymanual, f) for f in listdir(healthymanual)]
+    for i in range(len(healthy_paths)):
+        print(healthy_paths[i])
+        print(healthymanual_paths[i])
+        print()
+        pictures.append(Picture(healthy_paths[i], healthymanual_paths[i]))
+    return pictures
 
 def resize(image, width):
     (h, w) = image.shape[:2]
@@ -119,9 +134,10 @@ def evaluation(processed, actual):
 
 
 
-paths = get_paths('pictures')
-test_image = image_processing(paths[-1][0])
-# show_image(test_image)
-actual_image = read_image(paths[-1][1], cv2.IMREAD_GRAYSCALE, 800)
-# show_image(actual_image)
-evaluation(test_image, actual_image)
+paths = getPaths()
+
+# test_image = image_processing(paths[0].original_path)
+# # show_image(test_image)
+# actual_image = read_image(paths[-1][1], cv2.IMREAD_GRAYSCALE, 800)
+# # show_image(actual_image)
+# evaluation(test_image, actual_image)

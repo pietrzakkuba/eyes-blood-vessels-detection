@@ -82,20 +82,41 @@ def image_processing(path):
     return cv2.bitwise_and(image, mask)
 
 
-def norm(image): return [list(map(int, row / 255)) for row in list(cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)[1])]
+def norm(image):
+    return [point for row in
+            [list(map(int, row / 255)) for row in list(cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)[1])]
+            for point in row]
+
+
+def analysis(tested_values, actual_values):
+    tn = 0
+    fn = 0
+    fp = 0
+    tp = 0
+    for pair in zip(tested_values, actual_values):
+        if pair[0] == 0 and pair[1] == 0:
+            tn += 1
+        elif pair[0] == 0 and pair[1] == 1:
+            fn += 1
+        elif pair[0] == 1 and pair[1] == 0:
+            fp += 1
+        else:
+            tp += 1
+    return float(tn), float(fn), float(fp), float(tp)
 
 
 def evaluation(processed, actual):
-    print(norm(processed))
-    # TODO trafność // trafność jest dziwna - nie jest wartością, czułość i swoistość są jej miarami
-    # TODO https://pqstat.pl/?mod_f=diagnoza
-    # TODO naczynie - positive, tło - negative
-    accuracy = None  # wiec to chyba nieprzydatne
-    # TODO czułość TP/(TP+FN)
-    sensitivity = None
-    # TODO swoistość TN/(FP+TN)
-    specificity = None
+    tn, fn, fp, tp = analysis(norm(processed), norm(actual))
+    # TODO macierze pomyłek
+    # trafność // trafność jest dziwna - nie jest wartością, czułość i swoistość są jej miarami
+    # https://pqstat.pl/?mod_f=diagnoza
+    # naczynie - positive, tło - negative
+    # accuracy = None  # wiec to chyba nieprzydatne
+    sensitivity = tp / (tp + fn)     # czułość
+    specificity = tn / (fp + tn)     # swoistość
+    print('czułość: {}'.format(sensitivity), 'swoistość: {}'.format(specificity))
     # TODO miary dla danych niezrównoważonych
+
 
 
 paths = get_paths('pictures')

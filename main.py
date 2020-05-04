@@ -33,20 +33,20 @@ def get_paths(dir_name):
     return [[pic.original_path, pic.target_paths] for pic in picture_list]
 
 
-def resize(image, width):
+def resize(image, width, interpolation=cv2.INTER_AREA):
     (h, w) = image.shape[:2]
     ratio = w / width
     height = int(np.round(h / ratio))
-    return cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+    return cv2.resize(image, (width, height), interpolation=interpolation)
 
 
-def read_image(path, method, size):
+def read_image(path, method):
     image = cv2.imread(path, method)
-    image = resize(image, size)
     return image
 
 
 def show_image(image):
+    image = resize(image, 800)
     cv2.imshow('image', image)
     cv2.waitKey(0)
 
@@ -59,9 +59,10 @@ def adjust_gamma(image, gamma):
 
 
 def image_processing(path):
-    image = read_image(path, cv2.IMREAD_COLOR, 800)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = read_image(path, cv2.IMREAD_COLOR)
+    width = image.shape[1]
     image = resize(image, 800)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     image = adjust_gamma(image, 1.07)
     image = cv2.GaussianBlur(image, (3, 3), 0)
     high_threshold, _ = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -79,7 +80,9 @@ def image_processing(path):
     mask = resize(mask, 800)
     mask = cv2.erode(mask, kernel, iterations=3)
     #############################################################
-    return cv2.bitwise_and(image, mask)
+    image = cv2.bitwise_and(image, mask)
+    image = resize(image, width)
+    return image
 
 
 def norm(image):
@@ -107,7 +110,7 @@ def analysis(tested_values, actual_values):
 
 def evaluation(processed, actual):
     tn, fn, fp, tp = analysis(norm(processed), norm(actual))
-    # TODO macierze pomyłek
+    print(tn + fn + fp + tp)
     # trafność // trafność jest dziwna - nie jest wartością, czułość i swoistość są jej miarami
     # https://pqstat.pl/?mod_f=diagnoza
     # naczynie - positive, tło - negative
@@ -118,10 +121,9 @@ def evaluation(processed, actual):
     # TODO miary dla danych niezrównoważonych
 
 
-
 paths = get_paths('pictures')
 test_image = image_processing(paths[-1][0])
-# show_image(test_image)
-actual_image = read_image(paths[-1][1], cv2.IMREAD_GRAYSCALE, 800)
-# show_image(actual_image)
+show_image(test_image)
+actual_image = read_image(paths[-1][1], cv2.IMREAD_GRAYSCALE)
+show_image(actual_image)
 evaluation(test_image, actual_image)

@@ -1,9 +1,5 @@
 import numpy as np
-import matplotlib
 import cv2
-from os import listdir
-from os.path import isfile, join
-import sys
 
 
 def read(path, method):

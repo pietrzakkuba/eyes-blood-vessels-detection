@@ -11,34 +11,37 @@ class Picture:
         self.original_path = original_path
         self.target_path = target_path
 
-def getPaths():
-    healthy='pictures\healthy'
-    healthymanual='pictures\healthy_manualsegm'
-    pictures=[]
 
-    healthy_paths=[join(healthy, f) for f in listdir(healthy)]
-    healthymanual_paths = [join(healthymanual, f) for f in listdir(healthymanual)]
+def getPaths():
+    healthy = 'pictures\\healthy'
+    healthy_manual = 'pictures\\healthy_manualsegm'
+    pictures = []
+
+    healthy_paths = [join(healthy, f) for f in listdir(healthy)]
+    healthy_manual_paths = [join(healthy_manual, f) for f in listdir(healthy_manual)]
     for i in range(len(healthy_paths)):
         print(healthy_paths[i])
-        print(healthymanual_paths[i])
+        print(healthy_manual_paths[i])
         print()
-        pictures.append(Picture(healthy_paths[i], healthymanual_paths[i]))
+        pictures.append(Picture(healthy_paths[i], healthy_manual_paths[i]))
     return pictures
 
-def resize(image, width):
-    (h, w) = image.shape[:2]
-    ratio = w / width
-    height = int(np.round(h / ratio))
-    return cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+
+def resize(image, width, height=None, interpolation=cv2.INTER_AREA):
+    if height is None:
+        (h, w) = image.shape[:2]
+        ratio = w / width
+        height = int(np.round(h / ratio))
+    return cv2.resize(image, (width, height), interpolation=interpolation)
 
 
-def read_image(path, method, size):
+def read_image(path, method):
     image = cv2.imread(path, method)
-    image = resize(image, size)
     return image
 
 
 def show_image(image):
+    image = resize(image, 800)
     cv2.imshow('image', image)
     cv2.waitKey(0)
 
@@ -51,8 +54,10 @@ def adjust_gamma(image, gamma):
 
 
 def image_processing(path):
-    image = read_image(path, cv2.IMREAD_COLOR, 800)
+    image = read_image(path, cv2.IMREAD_COLOR)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    height = image.shape[0]
+    width = image.shape[1]
     image = resize(image, 800)
     image = adjust_gamma(image, 1.07)
     image = cv2.GaussianBlur(image, (3, 3), 0)
@@ -71,7 +76,9 @@ def image_processing(path):
     mask = resize(mask, 800)
     mask = cv2.erode(mask, kernel, iterations=3)
     #############################################################
-    return cv2.bitwise_and(image, mask)
+    image = cv2.bitwise_and(image, mask)
+    image = resize(image, width, height)
+    return image
 
 
 def norm(image):
@@ -99,22 +106,17 @@ def analysis(tested_values, actual_values):
 
 def evaluation(processed, actual):
     tn, fn, fp, tp = analysis(norm(processed), norm(actual))
-    # TODO macierze pomyłek
-    # trafność // trafność jest dziwna - nie jest wartością, czułość i swoistość są jej miarami
-    # https://pqstat.pl/?mod_f=diagnoza
-    # naczynie - positive, tło - negative
-    # accuracy = None  # wiec to chyba nieprzydatne
-    sensitivity = tp / (tp + fn)     # czułość
-    specificity = tn / (fp + tn)     # swoistość
+    print(sum((tn, fn, fp, tp)))
+    sensitivity = tp / (tp + fn)  # czułość
+    specificity = tn / (fp + tn)  # swoistość
     print('czułość: {}'.format(sensitivity), 'swoistość: {}'.format(specificity))
     # TODO miary dla danych niezrównoważonych
 
 
-
 paths = getPaths()
-test_image=image_processing(paths[0].original_path)
+test_image = image_processing(paths[0].original_path)
 show_image(test_image)
-actual_image = read_image(paths[0].target_path, cv2.IMREAD_GRAYSCALE, 800)
+actual_image = read_image(paths[0].target_path, cv2.IMREAD_GRAYSCALE)
 show_image(actual_image)
 evaluation(test_image, actual_image)
 

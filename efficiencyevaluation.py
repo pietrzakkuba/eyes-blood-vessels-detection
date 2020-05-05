@@ -3,7 +3,7 @@ import cv2
 
 def norm(image):
     return [point for row in
-            [list(map(int, row / 255)) for row in list(cv2.threshold(image, 1, 255, cv2.THRESH_BINARY)[1])]
+            [list(map(int, row / 255)) for row in list(cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)[1])]
             for point in row]
 
 
@@ -26,7 +26,8 @@ def analysis(tested_values, actual_values):
 
 def evaluation(processed, actual):
     tn, fn, fp, tp = analysis(norm(processed), norm(actual))
+    accuracy = (tp + tn) / (tn + fn + fp + tp) # trafność
     sensitivity = tp / (tp + fn)  # czułość
     specificity = tn / (fp + tn)  # swoistość
-    print('czułość: {}'.format(sensitivity), 'swoistość: {}'.format(specificity))
+    print('trafność: {}'.format(accuracy), 'czułość: {}'.format(sensitivity), 'swoistość: {}'.format(specificity))
     # TODO miary dla danych niezrównoważonych

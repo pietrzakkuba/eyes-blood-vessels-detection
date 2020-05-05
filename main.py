@@ -4,6 +4,7 @@ from Picture import Picture
 from efficiencyevaluation import evaluation
 import cv2
 
+
 def get_pictures():
     healthy = 'pictures\\healthy'
     healthy_fovmask = 'pictures\\healthy_fovmask'
@@ -16,17 +17,17 @@ def get_pictures():
 
 
 pictures = get_pictures()
-# pictures[0].process_image()
+pictures[0].process_image()
 # pictures[0].show_image()
 # pictures[0].show_target()
-#
-# evaluation(pictures[0].image, pictures[0].target)
 
-originalimage= Picture.cutMiddleSquare(cv2.imread(pictures[1].original_path, cv2.IMREAD_GRAYSCALE))
-targetimage=Picture.cutMiddleSquare(cv2.imread(pictures[1].target_path, cv2.IMREAD_GRAYSCALE))
+evaluation(pictures[0].image, pictures[0].target)
 
-cv2.imshow('a', cv2.resize(targetimage,(400, 400)))
-Picture.cutIntoSquares(targetimage)
-cv2.waitKey(0)
+original_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].original_path, cv2.IMREAD_GRAYSCALE))
+target_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].target_path, cv2.IMREAD_GRAYSCALE))
+
+# cv2.imshow('a', cv2.resize(target_image, (400, 400)))
+# Picture.cutIntoSquares(target_image)
+# cv2.waitKey(0)
 
 

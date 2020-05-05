@@ -69,15 +69,15 @@ class Picture:
         return image[hcut:h - hcut, wcut:w - wcut]
 
     @staticmethod
-    def cutIntoSquares(image, squareSize=1024):
-        div = int(2048 / squareSize)
+    def cutIntoSquares(image, square_size=512):
+        div = int(2048 / square_size)
         squares = []
         for i in range(div):
             for j in range(div):
-                squares.append(image[i * squareSize:(i + 1) * squareSize, j * squareSize:(j + 1) * squareSize])
+                squares.append(image[i * square_size:(i + 1) * square_size, j * square_size:(j + 1) * square_size])
         for i in range(len(squares)):
             squares = [cv2.resize(square, (256, 256)) for square in squares]
             cv2.putText(squares[i], str(i), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2,
                         cv2.LINE_AA)
-            cv2.imshow(str(i), squares[i])
+            # cv2.imshow(str(i), squares[i])
         return squares

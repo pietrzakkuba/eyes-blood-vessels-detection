@@ -4,6 +4,7 @@ from random import randint, seed
 from Segment import Segment
 import sys
 
+
 # imgToCut[:, :, 2]=0
 
 class Picture:
@@ -82,11 +83,8 @@ class Picture:
     def get_segments(self, size=5, quantity=300):
         seed()
         imgToCut = Picture.cutMiddleSquare(self.original_image)
-        Picture.test_image(imgToCut, 'bez czerwonego', 600)
         imgToCheck = Picture.cutMiddleSquare(self.target)
-        imgToCheckBinary = imgToCheck/255
-
-        cutsize = size // 2
+        imgToCheckBinary = imgToCheck / 255
 
         h, w = imgToCheck.shape
 
@@ -94,14 +92,17 @@ class Picture:
         negativeSegment = []
 
         while (len(positiveSegment) != quantity or len(negativeSegment) != quantity):
-            x = randint(cutsize, w - cutsize - 1)
-            y = randint(cutsize, w - cutsize - 1)
+            x = randint(0, w - size)
+            y = randint(0, w - size)
 
             value = int(imgToCheckBinary[x][y])
 
             if value and len(positiveSegment) != quantity:
                 positiveSegment.append(
-                    Segment(imgToCut[x - cutsize:x + cutsize + 1, y - cutsize:y + cutsize + 1], value, (y, x)))
+                    Segment(imgToCut[x:x + size, y:y + size], value))
             elif not value and len(negativeSegment) != quantity:
-                    negativeSegment.append(
-                        Segment(imgToCut[x - cutsize:x + cutsize + 1, y - cutsize:y + cutsize + 1], value, (y, x)))
+                negativeSegment.append(
+                    Segment(imgToCut[x:x + size, y:y + size], value))
+
+        [seg.segment for seg in positiveSegment] + [seg.segment for seg in negativeSegment]
+        [seg.label for seg in positiveSegment]

@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 from random import randint, seed
 from Segment import Segment
+import sys
+
+# imgToCut[:, :, 2]=0
 
 class Picture:
     def __init__(self, original_path, fovmask_path, target_path):
@@ -53,6 +56,11 @@ class Picture:
         cv2.waitKey(0)
 
     @staticmethod
+    def test_image(image, name='test', size=200):
+        image = Picture.resize(image, size, size)
+        cv2.imshow(name, image)
+
+    @staticmethod
     def read(path, method):
         return cv2.imread(path, method)
 
@@ -66,37 +74,34 @@ class Picture:
 
     @staticmethod
     def cutMiddleSquare(image):
-        h, w = image.shape
+        h, w = image.shape[0:2]
         hcut = int((h - 2048) / 2)
         wcut = int((w - 2048) / 2)
         return image[hcut:h - hcut, wcut:w - wcut]
 
-    @staticmethod
-    def cutIntoSquares(image, square_size=512):
-        div = int(2048 / square_size)
-        squares = []
-        for i in range(div):
-            for j in range(div):
-                squares.append(image[i * square_size:(i + 1) * square_size, j * square_size:(j + 1) * square_size])
-        for i in range(len(squares)):
-            squares = [cv2.resize(square, (256, 256)) for square in squares]
-            cv2.putText(squares[i], str(i), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2,
-                        cv2.LINE_AA)
-            # cv2.imshow(str(i), squares[i])
-        return squares
-
-    def get_labels(self):
-        labels = np.array([list(map(int, row / 255))
-                           for row in list(cv2.threshold(self.target, 127, 255, cv2.THRESH_BINARY)[1])])
-        return labels
-
-    def get_segments(self, size=5, quantity=1):
+    def get_segments(self, size=5, quantity=300):
         seed()
-        columns = self.original_image.shape[1]
-        rows = self.original_image.shape[0]
-        for i in range(quantity):
-            x = randint(0, columns - size + 1)
-            y = randint(0, rows - size + 1)
-            self.segments_list.append(Segment(self.original_image[y:y + size, x:x + size]))
+        imgToCut = Picture.cutMiddleSquare(self.original_image)
+        Picture.test_image(imgToCut, 'bez czerwonego', 600)
+        imgToCheck = Picture.cutMiddleSquare(self.target)
+        imgToCheckBinary = imgToCheck/255
 
+        cutsize = size // 2
 
+        h, w = imgToCheck.shape
+
+        positiveSegment = []
+        negativeSegment = []
+
+        while (len(positiveSegment) != quantity or len(negativeSegment) != quantity):
+            x = randint(cutsize, w - cutsize - 1)
+            y = randint(cutsize, w - cutsize - 1)
+
+            value = int(imgToCheckBinary[x][y])
+
+            if value and len(positiveSegment) != quantity:
+                positiveSegment.append(
+                    Segment(imgToCut[x - cutsize:x + cutsize + 1, y - cutsize:y + cutsize + 1], value, (y, x)))
+            elif not value and len(negativeSegment) != quantity:
+                    negativeSegment.append(
+                        Segment(imgToCut[x - cutsize:x + cutsize + 1, y - cutsize:y + cutsize + 1], value, (y, x)))

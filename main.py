@@ -17,11 +17,11 @@ def get_pictures():
 
 
 pictures = get_pictures()
-pictures[0].process_image()
-# pictures[0].show_image()
-# pictures[0].show_target()
-pictures[0].get_labels()
-# pictures[0].get_segments()
+# pictures[0].process_image()
+# # pictures[0].show_image()
+# # pictures[0].show_target()
+# pictures[0].get_labels()
+pictures[0].get_segments()
 
 # evaluation(pictures[0].basic_processing_image, pictures[0].target)
 

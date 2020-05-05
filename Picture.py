@@ -14,7 +14,7 @@ class Picture:
         self.target_path = target_path
         self.basic_processing_image = None
         self.target = self.read(target_path, cv2.IMREAD_GRAYSCALE)
-        self.original_image = self.read(self.original_path, cv2.IMREAD_GRAYSCALE)
+        self.original_image = self.read(self.original_path, cv2.IMREAD_COLOR)
         self.segments_list = []
 
     def adjust_gamma(self, gamma):
@@ -80,7 +80,7 @@ class Picture:
         wcut = int((w - 2048) / 2)
         return image[hcut:h - hcut, wcut:w - wcut]
 
-    def get_segments(self, size=5, quantity=300):
+    def get_segments(self, size=65, quantity=500):
         seed()
         imgToCut = Picture.cutMiddleSquare(self.original_image)
         imgToCheck = Picture.cutMiddleSquare(self.target)

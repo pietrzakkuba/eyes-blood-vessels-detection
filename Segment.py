@@ -1,6 +1,6 @@
 class Segment:
     def __init__(self, segment, target):
-        self.segment = segment
+        self.segment = segment / 255.0
         self.target = target
         self.center = self.get_center()
 

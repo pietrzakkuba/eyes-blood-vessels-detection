@@ -19,8 +19,7 @@ def get_pictures():
 
 pictures = get_pictures()
 positive, negative = pictures[0].get_segments()
-
-nnet=NeuralNetwork()
+nnet = NeuralNetwork()
 nnet.train(positive, negative)
 
 # evaluation(pictures[0].basic_processing_image, pictures[0].target)
@@ -31,5 +30,3 @@ nnet.train(positive, negative)
 # cv2.imshow('a', cv2.resize(target_image, (400, 400)))
 # Picture.cutIntoSquares(target_image)
 # cv2.waitKey(0)
-
-

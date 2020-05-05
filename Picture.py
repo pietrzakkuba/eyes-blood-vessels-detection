@@ -91,18 +91,15 @@ class Picture:
         positiveSegment = []
         negativeSegment = []
 
-        while (len(positiveSegment) != quantity or len(negativeSegment) != quantity):
+        while len(positiveSegment) != quantity or len(negativeSegment) != quantity:
             x = randint(0, w - size)
             y = randint(0, w - size)
-
             value = int(imgToCheckBinary[x][y])
-
             if value and len(positiveSegment) != quantity:
                 positiveSegment.append(
                     Segment(imgToCut[x:x + size, y:y + size], imgToCheck[x:x + size, y:y + size]))
             elif not value and len(negativeSegment) != quantity:
                 negativeSegment.append(
                     Segment(imgToCut[x:x + size, y:y + size], imgToCheck[x:x + size, y:y + size]))
-
         return positiveSegment, negativeSegment
 

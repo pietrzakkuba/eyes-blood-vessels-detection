@@ -81,3 +81,8 @@ class Picture:
                         cv2.LINE_AA)
             # cv2.imshow(str(i), squares[i])
         return squares
+
+    def get_labels(self):
+        labels = np.array([list(map(int, row / 255))
+                           for row in list(cv2.threshold(self.target, 127, 255, cv2.THRESH_BINARY)[1])])
+        return labels

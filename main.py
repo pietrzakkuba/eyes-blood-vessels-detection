@@ -20,11 +20,12 @@ pictures = get_pictures()
 pictures[0].process_image()
 # pictures[0].show_image()
 # pictures[0].show_target()
+pictures[0].get_labels()
 
 evaluation(pictures[0].image, pictures[0].target)
 
-original_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].original_path, cv2.IMREAD_GRAYSCALE))
-target_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].target_path, cv2.IMREAD_GRAYSCALE))
+# original_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].original_path, cv2.IMREAD_GRAYSCALE))
+# target_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].target_path, cv2.IMREAD_GRAYSCALE))
 
 # cv2.imshow('a', cv2.resize(target_image, (400, 400)))
 # Picture.cutIntoSquares(target_image)

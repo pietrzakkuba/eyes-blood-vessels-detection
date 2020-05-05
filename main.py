@@ -21,8 +21,9 @@ pictures[0].process_image()
 # pictures[0].show_image()
 # pictures[0].show_target()
 pictures[0].get_labels()
+# pictures[0].get_segments()
 
-evaluation(pictures[0].image, pictures[0].target)
+# evaluation(pictures[0].basic_processing_image, pictures[0].target)
 
 # original_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].original_path, cv2.IMREAD_GRAYSCALE))
 # target_image = Picture.cutMiddleSquare(cv2.imread(pictures[1].target_path, cv2.IMREAD_GRAYSCALE))

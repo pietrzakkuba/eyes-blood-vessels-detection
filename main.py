@@ -1,6 +1,7 @@
 from os import listdir
 from os.path import isfile, join
 from Picture import Picture
+from NeuralNetwork import NeuralNetwork
 from efficiencyevaluation import evaluation
 import cv2
 
@@ -17,11 +18,10 @@ def get_pictures():
 
 
 pictures = get_pictures()
-# pictures[0].process_image()
-# # pictures[0].show_image()
-# # pictures[0].show_target()
-# pictures[0].get_labels()
-pictures[0].get_segments()
+positive, negative = pictures[0].get_segments()
+
+nnet=NeuralNetwork()
+nnet.train(positive, negative)
 
 # evaluation(pictures[0].basic_processing_image, pictures[0].target)
 

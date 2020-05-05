@@ -14,7 +14,7 @@ class Picture:
         self.target_path = target_path
         self.basic_processing_image = None
         self.target = self.read(target_path, cv2.IMREAD_GRAYSCALE)
-        self.original_image = self.read(self.original_path, cv2.IMREAD_COLOR)
+        self.original_image = self.read(self.original_path, cv2.IMREAD_GRAYSCALE)
         self.segments_list = []
 
     def adjust_gamma(self, gamma):
@@ -99,10 +99,10 @@ class Picture:
 
             if value and len(positiveSegment) != quantity:
                 positiveSegment.append(
-                    Segment(imgToCut[x:x + size, y:y + size], value))
+                    Segment(imgToCut[x:x + size, y:y + size], imgToCheck[x:x + size, y:y + size]))
             elif not value and len(negativeSegment) != quantity:
                 negativeSegment.append(
-                    Segment(imgToCut[x:x + size, y:y + size], value))
+                    Segment(imgToCut[x:x + size, y:y + size], imgToCheck[x:x + size, y:y + size]))
 
-        [seg.segment for seg in positiveSegment] + [seg.segment for seg in negativeSegment]
-        [seg.label for seg in positiveSegment]
+        return positiveSegment, negativeSegment
+

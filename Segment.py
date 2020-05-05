@@ -1,5 +1,4 @@
 class Segment:
-    def __init__(self, array, label, center):
-        self.segment = array
-        self.label = label
-        self.center = center
+    def __init__(self, segment, target):
+        self.segment = segment
+        self.target= target

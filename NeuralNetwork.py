@@ -31,11 +31,12 @@ class NeuralNetwork:
                       loss='binary_crossentropy',
                       metrics=['accuracy'])
 
-    def train(self, positive, negative, n_split=3):
-        data = positive + negative
+    def train(self, data, n_split=3):
         random.shuffle(data)
-        x = np.array([sample.segment for sample in data])
-        y = np.array([sample.center for sample in data])
+        x=np.array([seg.segment for seg in data])
+        y=np.array([seg.label for seg in data])
+        random.shuffle(data)
+
         np.random.seed(0)
         indices = np.random.rand(len(data)) < 0.8  # 80% train
         train_images = x[indices]
@@ -64,23 +65,17 @@ class NeuralNetwork:
         test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
         print(test_acc)
 
-    def train2(self, positive, negative, n_split=3):
-        X = positive + negative
-        Y = [1 for x in positive] + [0 for x in negative]
+    def train2(self, data, n_split=3):
+        random.shuffle(data)
+        x = np.array([seg.segment for seg in data])
+        y = np.array([seg.label for seg in data])
+        random.shuffle(data)
 
-        order = [x for x in range(len(X))]
-        random.shuffle(order)
-        X = [X[i] for i in order]
-        Y = [Y[i] for i in order]
 
-        X = [x.segment for x in X]
-        X = np.array(X)
-        Y = np.array(Y)
-
-        for train_index, test_index in KFold(n_split).split(X):
+        for train_index, test_index in KFold(n_split).split(x):
             print("KFOLD!")
-            x_train, x_test = X[train_index], X[test_index]
-            y_train, y_test = Y[train_index], Y[test_index]
-            self.model.fit(x_train, y_train, epochs=5)
+            x_train, x_test = x[train_index], x[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+            self.model.fit(x_train, y_train, epochs=10)
 
             print('Model evaluation ', self.model.evaluate(x_test, y_test))

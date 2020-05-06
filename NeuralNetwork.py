@@ -88,7 +88,6 @@ class NeuralNetwork:
 
     def predictImage(self, picture, size):
         image = picture.original_image
-
         h, w = image.shape[:2]
 
         Picture.test_image(image, 'test1', 600)
@@ -123,7 +122,11 @@ class NeuralNetwork:
                     network_input=[]
                     print('predicted up to:', i, 'rows', counter,'segments')
 
+        if len(network_input):
+            predicted_values.append(self.model.predict(network_input))
 
+        print(predicted_values[:10])
+        predicted_values=np.array(predicted_values)
         print(predicted_values.shape)
         print(predicted_values[:10])
 

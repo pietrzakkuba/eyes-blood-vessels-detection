@@ -1,5 +1,6 @@
 import random
 
+import cv2
 import numpy as np
 from sklearn.model_selection import KFold
 import tensorflow as tf
@@ -11,6 +12,8 @@ import tensorflow as tf
 
 from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
+
+from Picture import Picture
 
 
 class NeuralNetwork:
@@ -28,13 +31,13 @@ class NeuralNetwork:
         self.model.add(layers.Dense(1, activation='sigmoid'))
         self.model.summary()
         self.model.compile(optimizer='adam',
-                      loss='binary_crossentropy',
-                      metrics=['accuracy'])
+                           loss='binary_crossentropy',
+                           metrics=['accuracy'])
 
     def train(self, data, n_split=3):
         random.shuffle(data)
-        x=np.array([seg.segment for seg in data])
-        y=np.array([seg.label for seg in data])
+        x = np.array([seg.segment for seg in data])
+        y = np.array([seg.label for seg in data])
         random.shuffle(data)
 
         np.random.seed(0)
@@ -64,18 +67,69 @@ class NeuralNetwork:
 
         test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
         print(test_acc)
+        model.save('.\\saved_model\\my_model1')
 
-    def train2(self, data, n_split=3):
+    def train2(self, data,epoch=10,  n_split=3):
         random.shuffle(data)
         x = np.array([seg.segment for seg in data])
         y = np.array([seg.label for seg in data])
         random.shuffle(data)
 
-
         for train_index, test_index in KFold(n_split).split(x):
-            print("KFOLD!")
             x_train, x_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            self.model.fit(x_train, y_train, epochs=10)
+            self.model.fit(x_train, y_train, epochs=epoch, validation_data=(x_test, y_test))
 
             print('Model evaluation ', self.model.evaluate(x_test, y_test))
+        self.model.save('.\\saved_model\\my_model2')
+
+    def load_model(self, name):
+        self.model = tf.keras.models.load_model('saved_model\\' +name)
+
+    def predictImage(self, picture, size):
+        image = picture.original_image
+
+        h, w = image.shape[:2]
+
+        Picture.test_image(image, 'test1', 600)
+
+        fovmask = picture.fovmask
+        blueChannel = image[:, :, 0]
+        greenChannel = image[:, :, 1]
+        redChannel = image[:, :, 2]
+        newColor = [np.average(blueChannel), np.average(greenChannel), np.average(redChannel)]
+        image[fovmask == 0] = newColor
+        padding = size // 2
+
+        image = cv2.copyMakeBorder(image, padding, padding, padding, padding, cv2.BORDER_CONSTANT, None, newColor)
+
+        network_input = []
+
+        predicted_values=[]
+        for i in range(h//200):
+            for j in range(w//200):
+                x = i + padding
+                y = j + padding
+
+                print(x, y)
+
+                test=np.array([image[x - padding:x + padding + 1, y - padding:y + padding + 1]/255.0])
+                predicted_values.append(self.model.predict(test))
+                # network_input.append(image[x - padding:x + padding + 1, y - padding:y + padding + 1]/255.0)
+
+        # print(network_input[0].shape)
+        # predicted_values=self.model.predict(network_input)
+
+        print(predicted_values)
+        predicted_values=np.array([x.ravel()[0] for x in predicted_values])
+        print(predicted_values)
+        predicted_values[predicted_values<0.5] = 0
+        predicted_values[predicted_values >= 0.5] = 1
+        print(predicted_values)
+
+
+        result_image=np.reshape(predicted_values, (h, w))
+
+        cv2.imshow('result', result_image)
+
+        cv2.waitKey(0)

@@ -1,5 +1,9 @@
 from os import listdir
 from os.path import isfile, join
+
+import numpy as np
+from numpy import float32
+
 from Picture import Picture
 from NeuralNetwork import NeuralNetwork
 from efficiencyevaluation import evaluation
@@ -19,10 +23,15 @@ def get_pictures():
 
 pictures = get_pictures()
 size = 65
-data = pictures[0].get_segments(size)
+data = pictures[0].get_segments(size, 900)
 nnet = NeuralNetwork(size)
 # nnet.train(data)
-nnet.train2(data)
+# nnet.train2(data, n_split=2)
+
+nnet.load_model('my_model2')
+nnet.predictImage(pictures[1], size)
+
+
 
 
 # evaluation(pictures[0].basic_processing_image, pictures[0].target)

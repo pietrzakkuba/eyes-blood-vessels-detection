@@ -14,6 +14,7 @@ class Picture:
         self.target_path = target_path
         self.basic_processing_image = None
         self.target = self.read(target_path, cv2.IMREAD_GRAYSCALE)
+        self.fovmask = self.read(fovmask_path, cv2.IMREAD_GRAYSCALE)
         self.original_image = self.read(self.original_path, cv2.IMREAD_COLOR)
         self.segments_list = []
 
@@ -58,7 +59,7 @@ class Picture:
 
     @staticmethod
     def test_image(image, name='test', size=200):
-        image = Picture.resize(image, size, size)
+        image = Picture.resize(image, size)
         cv2.imshow(name, image)
 
     @staticmethod

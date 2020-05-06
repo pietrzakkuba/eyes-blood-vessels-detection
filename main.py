@@ -19,9 +19,16 @@ def get_pictures():
 
 pictures = get_pictures()
 size = 65
-positive, negative = pictures[0].get_segments(size)
-nnet = NeuralNetwork(size)
-nnet.train(positive, negative)
+# positive, negative = pictures[0].get_segments(size)
+# nnet = NeuralNetwork(size)
+# # nnet.train(positive, negative)
+# nnet.train2(positive, negative)
+
+test=pictures[0].get_segments(size)
+
+test=[x.label for x in test]
+print(test)
+print(sum(test))
 
 # evaluation(pictures[0].basic_processing_image, pictures[0].target)
 

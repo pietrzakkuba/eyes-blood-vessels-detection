@@ -88,18 +88,21 @@ class Picture:
 
         h, w = imgToCheck.shape
 
-        positiveSegment = []
-        negativeSegment = []
+        segments=[]
+        positive=0
+        negative=0
 
-        while len(positiveSegment) != quantity or len(negativeSegment) != quantity:
+        while positive != quantity or negative != quantity:
             x = randint(0, w - size)
             y = randint(0, w - size)
             value = int(imgToCheckBinary[x][y])
-            if value and len(positiveSegment) != quantity:
-                positiveSegment.append(
-                    Segment(imgToCut[x:x + size, y:y + size], imgToCheck[x:x + size, y:y + size]))
-            elif not value and len(negativeSegment) != quantity:
-                negativeSegment.append(
-                    Segment(imgToCut[x:x + size, y:y + size], imgToCheck[x:x + size, y:y + size]))
-        return positiveSegment, negativeSegment
+            if value and positive != quantity:
+                segments.append(
+                    Segment(imgToCut[x:x + size, y:y + size], value))
+                positive+=1
+            elif not value and negative != quantity:
+                segments.append(
+                    Segment(imgToCut[x:x + size, y:y + size], value))
+                negative+=1
+        return segments
 

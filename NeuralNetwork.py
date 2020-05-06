@@ -16,6 +16,20 @@ import matplotlib.pyplot as plt
 class NeuralNetwork:
     def __init__(self, size):
         self.size = size
+        self.model = models.Sequential()
+        self.model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=(self.size, self.size, 3)))
+        self.model.add(layers.MaxPooling2D((2, 2)))
+        self.model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        self.model.add(layers.MaxPooling2D((2, 2)))
+        self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        self.model.add(layers.MaxPooling2D((2, 2)))
+        self.model.add(layers.Flatten())
+        self.model.add(layers.Dense(1024, activation='relu'))
+        self.model.add(layers.Dense(1, activation='sigmoid'))
+        self.model.summary()
+        self.model.compile(optimizer='adam',
+                      loss='binary_crossentropy',
+                      metrics=['accuracy'])
 
     def train(self, positive, negative, n_split=3):
         data = positive + negative
@@ -49,3 +63,24 @@ class NeuralNetwork:
 
         test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
         print(test_acc)
+
+    def train2(self, positive, negative, n_split=3):
+        X = positive + negative
+        Y = [1 for x in positive] + [0 for x in negative]
+
+        order = [x for x in range(len(X))]
+        random.shuffle(order)
+        X = [X[i] for i in order]
+        Y = [Y[i] for i in order]
+
+        X = [x.segment for x in X]
+        X = np.array(X)
+        Y = np.array(Y)
+
+        for train_index, test_index in KFold(n_split).split(X):
+            print("KFOLD!")
+            x_train, x_test = X[train_index], X[test_index]
+            y_train, y_test = Y[train_index], Y[test_index]
+            self.model.fit(x_train, y_train, epochs=5)
+
+            print('Model evaluation ', self.model.evaluate(x_test, y_test))

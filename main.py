@@ -26,7 +26,7 @@ size = 65
 data = pictures[0].get_segments(size, 900)
 nnet = NeuralNetwork(size)
 # nnet.train(data)
-# nnet.train2(data, n_split=2)
+# nnet.train2(data, n_split=3)
 
 nnet.load_model('my_model2')
 nnet.predictImage(pictures[1], size)

@@ -103,30 +103,29 @@ class NeuralNetwork:
 
         image = cv2.copyMakeBorder(image, padding, padding, padding, padding, cv2.BORDER_CONSTANT, None, newColor)
 
-        network_input = []
 
+        network_input=[]
         predicted_values=[]
-        for i in range(h//200):
-            for j in range(w//200):
+        counter=0
+
+        for i in range(h):
+            # print(i, counter)
+            for j in range(w):
+                counter+=1
                 x = i + padding
                 y = j + padding
 
-                print(x, y)
+                network_input.append(image[x - padding:x + padding + 1, y - padding:y + padding + 1]/255.0)
 
-                test=np.array([image[x - padding:x + padding + 1, y - padding:y + padding + 1]/255.0])
-                predicted_values.append(self.model.predict(test))
-                # network_input.append(image[x - padding:x + padding + 1, y - padding:y + padding + 1]/255.0)
+                if not counter%1000:
+                    network_input=np.array(network_input)
+                    predicted_values.append(self.model.predict(network_input))
+                    network_input=[]
+                    print('predicted up to:', i, 'rows', counter,'segments')
 
-        # print(network_input[0].shape)
-        # predicted_values=self.model.predict(network_input)
 
-        print(predicted_values)
-        predicted_values=np.array([x.ravel()[0] for x in predicted_values])
-        print(predicted_values)
-        predicted_values[predicted_values<0.5] = 0
-        predicted_values[predicted_values >= 0.5] = 1
-        print(predicted_values)
-
+        print(predicted_values.shape)
+        print(predicted_values[:10])
 
         result_image=np.reshape(predicted_values, (h, w))
 

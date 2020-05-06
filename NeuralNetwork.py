@@ -88,22 +88,17 @@ class NeuralNetwork:
 
     def predictImage(self, picture, size):
         image = picture.original_image
-        image= Picture.cutMiddleSquare(picture.original_image)
 
-        h, w = image.shape[:2]
-        cut=800
-        image= image[cut:h-cut, cut:w-cut]
-        print(image.shape)
         h, w = image.shape[:2]
 
         Picture.test_image(image, 'test1', 600)
 
-        # fovmask = picture.fovmask
+        fovmask = picture.fovmask
         blueChannel = image[:, :, 0]
         greenChannel = image[:, :, 1]
         redChannel = image[:, :, 2]
         newColor = [np.average(blueChannel), np.average(greenChannel), np.average(redChannel)]
-        # image[fovmask == 0] = newColor
+        image[fovmask == 0] = newColor
         padding = size // 2
 
         image = cv2.copyMakeBorder(image, padding, padding, padding, padding, cv2.BORDER_CONSTANT, None, newColor)
@@ -114,7 +109,6 @@ class NeuralNetwork:
         counter=0
 
         for i in range(h):
-            # print(i, counter)
             for j in range(w):
                 counter+=1
                 x = i + padding
@@ -134,8 +128,9 @@ class NeuralNetwork:
             predicted_values.append(self.model.predict(network_input))
 
         predicted_values=np.concatenate(predicted_values)
-        print(predicted_values.shape)
-        print(predicted_values[0])
+
+        predicted_values[predicted_values>=0.5]=1
+        predicted_values[predicted_values<0.5]=0
 
         result_image=np.reshape(predicted_values, (h, w))
 

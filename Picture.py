@@ -27,12 +27,13 @@ class Picture:
 
     def process_image(self):
         self.basic_processing_image=cv2.adaptiveThreshold(self.original_image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,45,2)
-        Picture.showImage(self.basic_processing_image)
-        Picture.showImage(self.original_image, 'origgreen')
+        Picture.showImage(self.true_original, 'original')
+        Picture.showImage(self.original_image, 'original - green channel')
+        self.show_image()
 
     def show_image(self):
         image = self.resize(self.basic_processing_image, 800)
-        cv2.imshow('image', image)
+        cv2.imshow('basic processing result', image)
         cv2.waitKey(0)
 
     def show_target(self):

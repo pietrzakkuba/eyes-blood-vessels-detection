@@ -32,20 +32,19 @@ for j in range(4):
         data=pictures[i].get_segments(size, 5000)
         nnet.train2(data, n_split=4)
 
-# # nnet.load_model('my_model2')
-# print('pic11')
-# nnet.predictImage(pictures[10], size, 'pic11')
-# print('pic12')
-# nnet.predictImage(pictures[11], size, 'pic12')
-# print('pic13')
-# nnet.predictImage(pictures[12], size, 'pic13')
-# print('pic14')
-# nnet.predictImage(pictures[13], size, 'pic14')
-# print('pic15')
-# nnet.predictImage(pictures[14], size, 'pic15')
+# nnet.load_model('my_model2')
+print('pic11')
+nnet.predictImage(pictures[10], size, 'pic11')
+print('pic12')
+nnet.predictImage(pictures[11], size, 'pic12')
+print('pic13')
+nnet.predictImage(pictures[12], size, 'pic13')
+print('pic14')
+nnet.predictImage(pictures[13], size, 'pic14')
+print('pic15')
+nnet.predictImage(pictures[14], size, 'pic15')
 
 
-pictures[0].process_image()
 
 
 # evaluation(pictures[0].basic_processing_image, pictures[0].target)

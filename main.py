@@ -24,14 +24,14 @@ def get_pictures():
 pictures = get_pictures()
 size = 65
 
-# nnet = NeuralNetwork(size)
-#
-# for j in range(4):
-#     for i in range(10):
-#         print('trening na obrazku:', i)
-#         data=pictures[i].get_segments(size, 5000)
-#         nnet.train2(data, n_split=4)
-#
+nnet = NeuralNetwork(size)
+
+for j in range(4):
+    for i in range(10):
+        print('trening na obrazku:', i)
+        data=pictures[i].get_segments(size, 5000)
+        nnet.train2(data, n_split=4)
+
 # # nnet.load_model('my_model2')
 # print('pic11')
 # nnet.predictImage(pictures[10], size, 'pic11')

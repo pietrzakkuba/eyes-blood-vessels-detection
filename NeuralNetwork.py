@@ -22,16 +22,17 @@ class NeuralNetwork:
     def __init__(self, size):
         self.size = size
         self.model = models.Sequential()
-        self.model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=(self.size, self.size, 3)))
+
+        self.model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=(self.size, self.size, 1)))
         self.model.add(layers.MaxPooling2D((2, 2)))
-        self.model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        self.model.add(layers.MaxPooling2D((2, 2)))
-        self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        self.model.add(layers.MaxPooling2D((2, 2)))
+        # self.model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        # self.model.add(layers.MaxPooling2D((2, 2)))
+        # self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        # self.model.add(layers.MaxPooling2D((2, 2)))
         self.model.add(layers.Flatten())
         self.model.add(layers.Dense(512, activation='relu'))
         self.model.add(layers.Dense(1, activation='sigmoid'))
-        self.model.summary()
+        # self.model.summary()
         self.model.compile(optimizer='adam',
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
@@ -40,7 +41,9 @@ class NeuralNetwork:
         random.shuffle(data)
         x = np.array([seg.segment for seg in data])
         y = np.array([seg.label for seg in data])
-        random.shuffle(data)
+
+        x = np.expand_dims(x, -1)
+        y = np.expand_dims(y, -1)
 
         for train_index, test_index in KFold(n_split).split(x):
             x_train, x_test = x[train_index], x[test_index]

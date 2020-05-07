@@ -10,6 +10,8 @@ from tensorflow.keras import datasets, layers, models
 import sys
 import tensorflow as tf
 
+from datetime import datetime
+
 from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 
@@ -27,47 +29,12 @@ class NeuralNetwork:
         self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
         self.model.add(layers.MaxPooling2D((2, 2)))
         self.model.add(layers.Flatten())
-        self.model.add(layers.Dense(1024, activation='relu'))
+        self.model.add(layers.Dense(512, activation='relu'))
         self.model.add(layers.Dense(1, activation='sigmoid'))
         self.model.summary()
         self.model.compile(optimizer='adam',
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
-
-    def train(self, data, n_split=3):
-        random.shuffle(data)
-        x = np.array([seg.segment for seg in data])
-        y = np.array([seg.label for seg in data])
-        random.shuffle(data)
-
-        np.random.seed(0)
-        indices = np.random.rand(len(data)) < 0.8  # 80% train
-        train_images = x[indices]
-        test_images = x[~indices]
-        train_labels = y[indices]
-        test_labels = y[~indices]
-        #######################################
-        model = models.Sequential()
-        model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=(self.size, self.size, 3)))
-        model.add(layers.MaxPooling2D((2, 2)))
-        model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        model.add(layers.MaxPooling2D((2, 2)))
-        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        model.add(layers.MaxPooling2D((2, 2)))
-        model.add(layers.Flatten())
-        model.add(layers.Dense(1024, activation='relu'))
-        model.add(layers.Dense(1, activation='sigmoid'))
-        model.summary()
-        model.compile(optimizer='adam',
-                      loss='binary_crossentropy',
-                      metrics=['accuracy'])
-
-        history = model.fit(train_images, train_labels, epochs=10,
-                            validation_data=(test_images, test_labels))
-
-        test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
-        print(test_acc)
-        model.save('.\\saved_model\\my_model1')
 
     def train2(self, data,epoch=10,  n_split=3):
         random.shuffle(data)
@@ -86,12 +53,10 @@ class NeuralNetwork:
     def load_model(self, name):
         self.model = tf.keras.models.load_model('saved_model\\' +name)
 
-    def predictImage(self, picture, size):
+    def predictImage(self, picture, size, name):
         image = picture.original_image
 
         h, w = image.shape[:2]
-
-        Picture.test_image(image, 'test1', 600)
 
         fovmask = picture.fovmask
         blueChannel = image[:, :, 0]
@@ -121,7 +86,10 @@ class NeuralNetwork:
                     predicted_values.append(self.model.predict(network_input))
 
                     network_input=[]
-                    print('predicted up to:', i, 'rows', counter,'segments')
+                if not counter%1000000:
+                    print('predicted up to:', i, 'rows', counter, 'segments')
+                    print(datetime.now().strftime("%H:%M:%S"))
+                    print()
 
         if len(network_input):
             network_input = np.array(network_input)
@@ -129,11 +97,12 @@ class NeuralNetwork:
 
         predicted_values=np.concatenate(predicted_values)
 
-        predicted_values[predicted_values>=0.5]=1
-        predicted_values[predicted_values<0.5]=0
+        predicted_values[predicted_values>=0.7]=1
+        predicted_values[predicted_values<0.7]=0
 
         result_image=np.reshape(predicted_values, (h, w))
 
-        cv2.imshow('result', result_image)
+        cv2.imwrite('result\\'+name+'.jpg', result_image*255)
+        Picture.test_image(result_image, 'result', 600)
 
-        cv2.waitKey(0)
+

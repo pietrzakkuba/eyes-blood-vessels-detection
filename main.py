@@ -23,13 +23,26 @@ def get_pictures():
 
 pictures = get_pictures()
 size = 65
-data = pictures[0].get_segments(size, 900)
-nnet = NeuralNetwork(size)
-# nnet.train(data)
-nnet.train2(data, n_split=3)
 
-nnet.load_model('my_model2')
-nnet.predictImage(pictures[1], size)
+nnet = NeuralNetwork(size)
+
+for j in range(4):
+    for i in range(10):
+        print('trening na obrazku:', i)
+        data=pictures[i].get_segments(size, 5000)
+        nnet.train2(data, n_split=4)
+
+# nnet.load_model('my_model2')
+print('pic11')
+nnet.predictImage(pictures[10], size, 'pic11')
+print('pic12')
+nnet.predictImage(pictures[11], size, 'pic12')
+print('pic13')
+nnet.predictImage(pictures[12], size, 'pic13')
+print('pic14')
+nnet.predictImage(pictures[13], size, 'pic14')
+print('pic15')
+nnet.predictImage(pictures[14], size, 'pic15')
 
 
 
@@ -42,3 +55,4 @@ nnet.predictImage(pictures[1], size)
 # cv2.imshow('a', cv2.resize(target_image, (400, 400)))
 # Picture.cutIntoSquares(target_image)
 # cv2.waitKey(0)
+cv2.waitKey(0)

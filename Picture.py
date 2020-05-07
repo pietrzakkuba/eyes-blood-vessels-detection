@@ -49,7 +49,7 @@ class Picture:
 
     def show_image(self):
         image = self.resize(self.basic_processing_image, 800)
-        cv2.imshow('image', image)
+        cv2.imshow('basic processing result', image)
         cv2.waitKey(0)
 
     def show_target(self):

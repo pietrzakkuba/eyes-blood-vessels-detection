@@ -82,7 +82,6 @@ class MainFrame(Frame):
 
     def console(self):
         self.console_text_area = Text(self, width=100, height=10)
-        self.console_text_area.insert(INSERT, 'This is console :)\n')
         self.console_text_area.configure(state="disabled")
         self.console_text_area.pack()
 
@@ -92,13 +91,14 @@ class MainFrame(Frame):
         self.console_text_area.configure(state="disabled")
 
     def work(self):
+        self.write_to_console('Please, keep track of Python console as well')
         self.write_to_console('reading images')
         self.write_to_console('basic image processing')
         self.picture = Picture.Picture(
             self.select_text_area_pic.get('1.0', END)[:-1],
             self.select_text_area_mask.get('1.0', END)[:-1],
             self.select_text_area_target.get('1.0', END)[:-1])
-        self.picture.process_image()
+        self.picture.process_image_basic()
         self.write_to_console(
             '(accuracy,           sensitivity,        specificity)'
         )
@@ -107,6 +107,17 @@ class MainFrame(Frame):
                                             self.picture.target)
         ))
         self.write_to_console('advanced image processing')
+        self.picture.process_image_advanced()
+        self.write_to_console(
+            '(accuracy,           sensitivity,        specificity)'
+        )
+        self.write_to_console(str(
+            efficiencyevaluation.evaluation(self.picture.advanced_processing_image,
+                                            self.picture.target)
+        ))
+        self.write_to_console('finished\nimages were saved in result/ dir')
+
+
 
 
 

@@ -36,7 +36,7 @@ class NeuralNetwork:
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
 
-    def train2(self, data,epoch=10,  n_split=3):
+    def train2(self, data, epoch=10, n_split=3):
         random.shuffle(data)
         x = np.array([seg.segment for seg in data])
         y = np.array([seg.label for seg in data])
@@ -51,7 +51,7 @@ class NeuralNetwork:
         self.model.save('.\\saved_model\\my_model2')
 
     def load_model(self, name):
-        self.model = tf.keras.models.load_model('saved_model\\' +name)
+        self.model = tf.keras.models.load_model('saved_model\\' + name)
 
     def predictImage(self, picture, size, name):
         image = picture.original_image
@@ -68,25 +68,24 @@ class NeuralNetwork:
 
         image = cv2.copyMakeBorder(image, padding, padding, padding, padding, cv2.BORDER_CONSTANT, None, newColor)
 
-
-        network_input=[]
-        predicted_values=[]
-        counter=0
+        network_input = []
+        predicted_values = []
+        counter = 0
 
         for i in range(h):
             for j in range(w):
-                counter+=1
+                counter += 1
                 x = i + padding
                 y = j + padding
 
-                network_input.append(image[x - padding:x + padding + 1, y - padding:y + padding + 1]/255.0)
+                network_input.append(image[x - padding:x + padding + 1, y - padding:y + padding + 1] / 255.0)
 
-                if not counter%1000:
-                    network_input=np.array(network_input)
+                if not counter % 1000:
+                    network_input = np.array(network_input)
                     predicted_values.append(self.model.predict(network_input))
 
-                    network_input=[]
-                if not counter%1000000:
+                    network_input = []
+                if not counter % 1000000:
                     print('predicted up to:', i, 'rows', counter, 'segments')
                     print(datetime.now().strftime("%H:%M:%S"))
                     print()
@@ -95,14 +94,12 @@ class NeuralNetwork:
             network_input = np.array(network_input)
             predicted_values.append(self.model.predict(network_input))
 
-        predicted_values=np.concatenate(predicted_values)
+        predicted_values = np.concatenate(predicted_values)
 
-        predicted_values[predicted_values>=0.7]=1
-        predicted_values[predicted_values<0.7]=0
+        predicted_values[predicted_values >= 0.7] = 1
+        predicted_values[predicted_values < 0.7] = 0
 
-        result_image=np.reshape(predicted_values, (h, w))
+        result_image = np.reshape(predicted_values, (h, w))
 
-        cv2.imwrite('result\\'+name+'.jpg', result_image*255)
+        cv2.imwrite('result\\' + name + '.jpg', result_image * 255)
         Picture.test_image(result_image, 'result', 600)
-
-

@@ -15,7 +15,8 @@ class Picture:
         self.basic_processing_image = None
         self.target = self.read(target_path, cv2.IMREAD_GRAYSCALE)
         self.fovmask = self.read(fovmask_path, cv2.IMREAD_GRAYSCALE)
-        self.original_image = self.read(self.original_path, cv2.IMREAD_COLOR)
+        self.true_original = self.read(self.original_path, cv2.IMREAD_COLOR)
+        self.original_image = cv2.GaussianBlur(self.true_original[:, :, 1], (21, 21), 0)
         self.segments_list = []
 
     def adjust_gamma(self, gamma):
@@ -25,27 +26,9 @@ class Picture:
         self.basic_processing_image = cv2.LUT(self.basic_processing_image, table)
 
     def process_image(self):
-        self.basic_processing_image = self.read(self.original_path, cv2.IMREAD_COLOR)
-        self.basic_processing_image = cv2.cvtColor(self.basic_processing_image, cv2.COLOR_BGR2GRAY)
-        height = self.basic_processing_image.shape[0]
-        width = self.basic_processing_image.shape[1]
-        self.basic_processing_image = self.resize(self.basic_processing_image, 800)
-        self.adjust_gamma(1.07)
-        self.basic_processing_image = cv2.GaussianBlur(self.basic_processing_image, (3, 3), 0)
-        high_threshold, _ = cv2.threshold(self.basic_processing_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        high_threshold *= 0.75
-        low_threshold = high_threshold / 2
-        self.basic_processing_image = cv2.Canny(self.basic_processing_image, low_threshold, high_threshold)
-        contours, hierarchy = cv2.findContours(self.basic_processing_image, 1, 2)
-        cv2.drawContours(self.basic_processing_image, contours, -1, (255, 255, 0), 3)
-        kernel = np.ones((3, 3), np.uint8)
-        self.basic_processing_image = cv2.dilate(self.basic_processing_image, kernel, iterations=1)
-        self.basic_processing_image = cv2.erode(self.basic_processing_image, kernel, iterations=1)
-        mask = self.read(self.fovmask_path, cv2.IMREAD_GRAYSCALE)
-        mask = self.resize(mask, 800)
-        mask = cv2.erode(mask, kernel, iterations=3)
-        self.basic_processing_image = cv2.bitwise_and(self.basic_processing_image, mask)
-        self.basic_processing_image = self.resize(self.basic_processing_image, width, height)
+        self.basic_processing_image=cv2.adaptiveThreshold(self.original_image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,45,2)
+        Picture.showImage(self.basic_processing_image)
+        Picture.showImage(self.original_image, 'origgreen')
 
     def show_image(self):
         image = self.resize(self.basic_processing_image, 800)
@@ -61,6 +44,14 @@ class Picture:
     def test_image(image, name='test', size=200):
         image = Picture.resize(image, size)
         cv2.imshow(name, image)
+
+    @staticmethod
+    def showImage(image, windowname='test', newh=600):
+        cv2.namedWindow(windowname, cv2.WINDOW_NORMAL)
+        h, w = image.shape[:2]
+        neww = int((newh / h) * w)
+        cv2.resizeWindow(windowname, neww, newh)
+        cv2.imshow(windowname, image)
 
     @staticmethod
     def read(path, method):

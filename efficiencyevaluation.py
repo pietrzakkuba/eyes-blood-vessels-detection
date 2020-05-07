@@ -26,8 +26,8 @@ def analysis(tested_values, actual_values):
 
 def evaluation(processed, actual):
     tn, fn, fp, tp = analysis(norm(processed), norm(actual))
-    accuracy = (tp + tn) / (tn + fn + fp + tp) # trafność
+    accuracy = (tp + tn) / (tn + fn + fp + tp)  # trafność
     sensitivity = tp / (tp + fn)  # czułość
     specificity = tn / (fp + tn)  # swoistość
-    print('trafność: {}'.format(accuracy), 'czułość: {}'.format(sensitivity), 'swoistość: {}'.format(specificity))
-    # TODO miary dla danych niezrównoważonych
+    return accuracy, sensitivity, specificity
+    # print('trafność: {}'.format(accuracy), 'czułość: {}'.format(sensitivity), 'swoistość: {}'.format(specificity))

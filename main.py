@@ -21,16 +21,46 @@ def get_pictures():
             for i in range(len(healthy_paths))]
 
 
-pictures = get_pictures()
-size = 65
-data = pictures[0].get_segments(size, 900)
-nnet = NeuralNetwork(size)
-# nnet.train(data)
-nnet.train2(data, n_split=3)
+# pictures[0].process_image()
+# pictures[0].show_image()
+# pictures[0].show_target()
+# evaluation(pictures[0].basic_processing_image, pictures[0].target)
+# size = 65
+# # data = pictures[0].get_segments(size, 10000)
+# data = []
+# for i in range(10):
+#     data = data + pictures[i].get_segments(size, 2000)
+#
+# nnet = NeuralNetwork(size)
+# # nnet.train(data)
+# nnet.train2(data, n_split=3)
+#
+# nnet.load_model('my_model2')
+# nnet.predictImage(pictures[1], size)
 
-nnet.load_model('my_model2')
-nnet.predictImage(pictures[1], size)
-
+print('OCENA SKUTECZNOŚCI ALGORYTMU')
+pictures = get_pictures()[-5:]
+print('na ' + str(len(pictures)) + ' obrazkach')
+accuracy_list_basic = []
+sensitivity_list_basic = []
+specificity_list_basic = []
+# accuracy_list_advanced = []
+# sensitivity_list_advanced = []
+# specificity_list_advanced = []
+for tested_picture in pictures:
+    tested_picture.process_image()
+    accuracy, sensitivity, specificity = evaluation(tested_picture.basic_processing_image, tested_picture.target)
+    accuracy_list_basic.append(accuracy)
+    sensitivity_list_basic.append(sensitivity)
+    specificity_list_basic.append(specificity)
+    # test_picture.PRZETWARZANIE_OBRAZKA_PRZEZ_SIEC() #TODO
+    # accuracy, sensitivity, specificity = evaluation(/*OBRAZEK Z SIECI NEURONWEJ*/, tested_picture.target) #TODO
+    # accuracy_list_advanced.append(accuracy)
+    # sensitivity_list_advanced.append(sensitivity)
+    # specificity_list_advanced.append(specificity)
+print('trafność algorytmu podstawowego: {0:4.3f}'.format(np.mean(accuracy_list_basic)))
+print('czułość algorytmu podstawowego: {0:4.3f}'.format(np.mean(sensitivity_list_basic)))
+print('swoistość algorytmu podstawowego: {0:4.3f}'.format(np.mean(specificity_list_basic)))
 
 
 

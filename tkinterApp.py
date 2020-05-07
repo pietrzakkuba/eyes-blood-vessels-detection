@@ -107,7 +107,6 @@ class MainFrame(Frame):
                                             self.picture.target)
         ))
         self.write_to_console('advanced image processing')
-        self.picture.show_image()
 
 
 

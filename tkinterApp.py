@@ -32,7 +32,6 @@ class MainFrame(Frame):
         self.select_entry_target()
         self.select_button_target()
         self.start_button()
-        self.console()
         self.picture = None
 
     def select_entry_pic(self):
@@ -80,42 +79,31 @@ class MainFrame(Frame):
     def start_button(self):
         Button(self, text='Start', command=self.work).pack()
 
-    def console(self):
-        self.console_text_area = Text(self, width=100, height=10)
-        self.console_text_area.configure(state="disabled")
-        self.console_text_area.pack()
-
-    def write_to_console(self, text):
-        self.console_text_area.configure(state="normal")
-        self.console_text_area.insert(INSERT, text + '\n')
-        self.console_text_area.configure(state="disabled")
-
     def work(self):
-        self.write_to_console('Please, keep track of Python console as well')
-        self.write_to_console('reading images')
-        self.write_to_console('basic image processing')
+        print('reading images')
+        print('basic image processing')
         self.picture = Picture.Picture(
             self.select_text_area_pic.get('1.0', END)[:-1],
             self.select_text_area_mask.get('1.0', END)[:-1],
             self.select_text_area_target.get('1.0', END)[:-1])
         self.picture.process_image_basic()
-        self.write_to_console(
+        print(
             '(accuracy,           sensitivity,        specificity)'
         )
-        self.write_to_console(str(
+        print(str(
             efficiencyevaluation.evaluation(self.picture.basic_processing_image,
                                             self.picture.target)
         ))
-        self.write_to_console('advanced image processing')
+        print('advanced image processing')
         self.picture.process_image_advanced()
-        self.write_to_console(
+        print(
             '(accuracy,           sensitivity,        specificity)'
         )
-        self.write_to_console(str(
+        print(str(
             efficiencyevaluation.evaluation(self.picture.advanced_processing_image,
                                             self.picture.target)
         ))
-        self.write_to_console('finished\nimages were saved in result/ dir')
+        print('finished\nimages were saved in result/ dir')
 
 
 

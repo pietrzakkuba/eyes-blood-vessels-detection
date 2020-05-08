@@ -26,9 +26,7 @@ size = 65
 
 nnet = NeuralNetwork(size)
 
-# data=pictures[0].get_segments(size, 2)
-
-for i in range(4):
+for j in range(4):
     for i in range(10):
         print('trening na obrazku:', i)
         data=pictures[i].get_segments(size, 5000)

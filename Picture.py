@@ -3,16 +3,20 @@ import cv2
 from random import randint, seed
 from Segment import Segment
 import sys
+import NeuralNetwork
 
 
 # imgToCut[:, :, 2]=0
 
 class Picture:
     def __init__(self, original_path, fovmask_path, target_path):
+        self.size = 65
         self.original_path = original_path
         self.fovmask_path = fovmask_path
         self.target_path = target_path
         self.basic_processing_image = None
+        self.advanced_processing_image = None
+        self.network = NeuralNetwork.NeuralNetwork(self.size)
         self.target = self.read(target_path, cv2.IMREAD_GRAYSCALE)
         self.fovmask = self.read(fovmask_path, cv2.IMREAD_GRAYSCALE)
         self.true_original = self.read(self.original_path, cv2.IMREAD_COLOR)
@@ -25,12 +29,29 @@ class Picture:
                           for i in np.arange(0, 256)]).astype("uint8")
         self.basic_processing_image = cv2.LUT(self.basic_processing_image, table)
 
-    def process_image(self):
-        self.basic_processing_image = cv2.adaptiveThreshold(self.original_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                                            cv2.THRESH_BINARY_INV, 45, 2)
+    def process_image_basic(self):
+        self.basic_processing_image = cv2.adaptiveThreshold(self.original_image,
+                                                          255,
+                                                          cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                          cv2.THRESH_BINARY_INV,
+                                                          45,
+                                                          2)
+        mask = self.read(self.fovmask_path, cv2.IMREAD_GRAYSCALE)
+        self.basic_processing_image = cv2.bitwise_and(self.basic_processing_image, mask)
         Picture.showImage(self.true_original, 'original')
         Picture.showImage(self.original_image, 'original - green channel')
+        cv2.imwrite('./result/basic processing result image.jpg', self.basic_processing_image)
         self.show_image()
+
+    def process_image_advanced(self):
+        # self.advanced_processing_image
+        self.network.load_model('my_model2')
+        self.advanced_processing_image = self.network.predictImage(self,
+                                                                   self.size,
+                                                                   'advanced processing result image')
+        mask = self.read(self.fovmask_path, cv2.IMREAD_GRAYSCALE)
+        self.advanced_processing_image = cv2.bitwise_and(self.advanced_processing_image, mask)
+        Picture.showImage(self.advanced_processing_image, 'advanced processing result')
 
     def show_image(self):
         image = self.resize(self.basic_processing_image, 800)
@@ -76,29 +97,27 @@ class Picture:
 
     def get_segments(self, size=65, quantity=500):
         seed()
-        # imgToCut = cv2.cvtColor(self.original_image,cv2.COLOR_GRAY2RGB)
-        imgToCut = self.original_image
-        imgToCut = Picture.cutMiddleSquare(imgToCut)
+        imgToCut = Picture.cutMiddleSquare(self.original_image)
         imgToCheck = Picture.cutMiddleSquare(self.target)
         imgToCheckBinary = imgToCheck / 255
 
-
         h, w = imgToCheck.shape
 
-        segments = []
-        positive = 0
-        negative = 0
+        segments=[]
+        positive=0
+        negative=0
 
         while positive != quantity or negative != quantity:
-            x = randint(size//2, w - size//2 - 1)
-            y = randint(size//2, w - size//2 - 1)
+            x = randint(0, w - size)
+            y = randint(0, w - size)
             value = int(imgToCheckBinary[x][y])
             if value and positive != quantity:
                 segments.append(
-                    Segment(imgToCut[x - size // 2:x +1+ size // 2, y - size // 2:y +1+ size // 2],imgToCheck[x - size // 2:x +1+ size // 2, y - size // 2:y +1+ size // 2], value))
-                positive += 1
+                    Segment(imgToCut[x:x + size, y:y + size], value))
+                positive+=1
             elif not value and negative != quantity:
                 segments.append(
-                    Segment(imgToCut[x - size // 2:x +1+ size // 2, y - size // 2:y+1 + size // 2],imgToCheck[x - size // 2:x +1+ size // 2, y - size // 2:y +1+ size // 2], value))
-                negative += 1
+                    Segment(imgToCut[x:x + size, y:y + size], value))
+                negative+=1
         return segments
+

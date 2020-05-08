@@ -15,7 +15,6 @@ from datetime import datetime
 from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 
-from Picture import Picture
 
 
 class NeuralNetwork:
@@ -57,7 +56,7 @@ class NeuralNetwork:
         self.model = tf.keras.models.load_model('saved_model\\' + name)
 
     def predictImage(self, picture, size, name):
-        image = picture.original_image
+        image = picture.true_original
 
         h, w = image.shape[:2]
 
@@ -75,7 +74,8 @@ class NeuralNetwork:
         network_input = []
         predicted_values = []
         counter = 0
-
+        counter2 = 0
+        pixels = w * h
         for i in range(h):
             for j in range(w):
                 counter += 1
@@ -85,15 +85,13 @@ class NeuralNetwork:
                 network_input.append(image[x - padding:x + padding + 1, y - padding:y + padding + 1] / 255.0)
 
                 if not counter % 1000:
+                    counter2 += 1
                     network_input = np.array(network_input)
                     network_input = np.expand_dims(network_input, -1)
                     predicted_values.append(self.model.predict(network_input))
-
                     network_input = []
-                if not counter % 1000000:
-                    print('predicted up to:', i, 'rows', counter, 'segments')
-                    print(datetime.now().strftime("%H:%M:%S"))
-                    print()
+                    if not counter2 % 10:
+                        print('progress: {} out of {}'.format(counter, pixels))
 
         if len(network_input):
             network_input = np.array(network_input)
@@ -106,6 +104,7 @@ class NeuralNetwork:
         predicted_values[predicted_values < 0.7] = 0
 
         result_image = np.reshape(predicted_values, (h, w))
-
-        cv2.imwrite('result\\' + name + '.jpg', result_image * 255)
-        Picture.test_image(result_image, 'result', 600)
+        result_image = result_image * 255
+        cv2.imwrite('result\\' + name + '.jpg', result_image)
+        return result_image
+        # Picture.test_image(result_image, 'result', 600)

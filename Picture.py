@@ -26,7 +26,8 @@ class Picture:
         self.basic_processing_image = cv2.LUT(self.basic_processing_image, table)
 
     def process_image(self):
-        self.basic_processing_image=cv2.adaptiveThreshold(self.original_image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,45,2)
+        self.basic_processing_image = cv2.adaptiveThreshold(self.original_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                            cv2.THRESH_BINARY_INV, 45, 2)
         Picture.showImage(self.true_original, 'original')
         Picture.showImage(self.original_image, 'original - green channel')
         self.show_image()
@@ -75,27 +76,29 @@ class Picture:
 
     def get_segments(self, size=65, quantity=500):
         seed()
-        imgToCut = Picture.cutMiddleSquare(self.original_image)
+        # imgToCut = cv2.cvtColor(self.original_image,cv2.COLOR_GRAY2RGB)
+        imgToCut = self.original_image
+        imgToCut = Picture.cutMiddleSquare(imgToCut)
         imgToCheck = Picture.cutMiddleSquare(self.target)
         imgToCheckBinary = imgToCheck / 255
 
+
         h, w = imgToCheck.shape
 
-        segments=[]
-        positive=0
-        negative=0
+        segments = []
+        positive = 0
+        negative = 0
 
         while positive != quantity or negative != quantity:
-            x = randint(0, w - size)
-            y = randint(0, w - size)
+            x = randint(size//2, w - size//2 - 1)
+            y = randint(size//2, w - size//2 - 1)
             value = int(imgToCheckBinary[x][y])
             if value and positive != quantity:
                 segments.append(
-                    Segment(imgToCut[x:x + size, y:y + size], value))
-                positive+=1
+                    Segment(imgToCut[x - size // 2:x +1+ size // 2, y - size // 2:y +1+ size // 2],imgToCheck[x - size // 2:x +1+ size // 2, y - size // 2:y +1+ size // 2], value))
+                positive += 1
             elif not value and negative != quantity:
                 segments.append(
-                    Segment(imgToCut[x:x + size, y:y + size], value))
-                negative+=1
+                    Segment(imgToCut[x - size // 2:x +1+ size // 2, y - size // 2:y+1 + size // 2],imgToCheck[x - size // 2:x +1+ size // 2, y - size // 2:y +1+ size // 2], value))
+                negative += 1
         return segments
-

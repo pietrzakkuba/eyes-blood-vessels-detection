@@ -25,10 +25,10 @@ class NeuralNetwork:
 
         self.model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=(self.size, self.size, 1)))
         self.model.add(layers.MaxPooling2D((2, 2)))
-        # self.model.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        # self.model.add(layers.MaxPooling2D((2, 2)))
-        # self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        # self.model.add(layers.MaxPooling2D((2, 2)))
+        self.model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        self.model.add(layers.MaxPooling2D((2, 2)))
+        self.model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        self.model.add(layers.MaxPooling2D((2, 2)))
         self.model.add(layers.Flatten())
         self.model.add(layers.Dense(512, activation='relu'))
         self.model.add(layers.Dense(1, activation='sigmoid'))
@@ -62,10 +62,11 @@ class NeuralNetwork:
         h, w = image.shape[:2]
 
         fovmask = picture.fovmask
-        blueChannel = image[:, :, 0]
-        greenChannel = image[:, :, 1]
-        redChannel = image[:, :, 2]
-        newColor = [np.average(blueChannel), np.average(greenChannel), np.average(redChannel)]
+        # blueChannel = image[:, :, 0]
+        # greenChannel = image[:, :, 1]
+        # redChannel = image[:, :, 2]
+        newColor = np.average(image)
+        # newColor = [np.average(blueChannel), np.average(greenChannel), np.average(redChannel)]
         image[fovmask == 0] = newColor
         padding = size // 2
 
@@ -85,6 +86,7 @@ class NeuralNetwork:
 
                 if not counter % 1000:
                     network_input = np.array(network_input)
+                    network_input = np.expand_dims(network_input, -1)
                     predicted_values.append(self.model.predict(network_input))
 
                     network_input = []
@@ -95,6 +97,7 @@ class NeuralNetwork:
 
         if len(network_input):
             network_input = np.array(network_input)
+            network_input = np.expand_dims(network_input, -1)
             predicted_values.append(self.model.predict(network_input))
 
         predicted_values = np.concatenate(predicted_values)

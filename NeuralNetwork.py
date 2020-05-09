@@ -56,7 +56,7 @@ class NeuralNetwork:
         self.model = tf.keras.models.load_model('saved_model\\' + name)
 
     def predictImage(self, picture, size, name):
-        image = picture.true_original
+        image = picture.original_image
 
         h, w = image.shape[:2]
 

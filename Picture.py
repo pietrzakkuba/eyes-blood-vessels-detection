@@ -38,19 +38,19 @@ class Picture:
                                                           2)
         mask = self.read(self.fovmask_path, cv2.IMREAD_GRAYSCALE)
         self.basic_processing_image = cv2.bitwise_and(self.basic_processing_image, mask)
+        cv2.imwrite('./result/basic processing result image.jpg', self.basic_processing_image)
         Picture.showImage(self.true_original, 'original')
         Picture.showImage(self.original_image, 'original - green channel')
-        cv2.imwrite('./result/basic processing result image.jpg', self.basic_processing_image)
         self.show_image()
 
     def process_image_advanced(self):
-        # self.advanced_processing_image
         self.network.load_model('my_model2')
         self.advanced_processing_image = self.network.predictImage(self,
                                                                    self.size,
                                                                    'advanced processing result image')
         mask = self.read(self.fovmask_path, cv2.IMREAD_GRAYSCALE)
         self.advanced_processing_image = cv2.bitwise_and(self.advanced_processing_image, mask)
+        cv2.imwrite('./result/advanced processing result image.jpg', self.basic_processing_image)
         Picture.showImage(self.advanced_processing_image, 'advanced processing result')
 
     def show_image(self):

@@ -4,17 +4,7 @@ import cv2
 import numpy as np
 from sklearn.model_selection import KFold
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Flatten, Embedding, LSTM, GRU, Conv1D, MaxPooling1D, Conv2D
 from tensorflow.keras import datasets, layers, models
-import sys
-import tensorflow as tf
-
-from datetime import datetime
-
-from tensorflow.keras import datasets, layers, models
-import matplotlib.pyplot as plt
-
 
 
 class NeuralNetwork:
@@ -22,6 +12,7 @@ class NeuralNetwork:
         self.size = size
         self.model = models.Sequential()
 
+    def create_model(self, size):
         self.model.add(layers.Conv2D(16, (3, 3), activation='relu', input_shape=(self.size, self.size, 1)))
         self.model.add(layers.MaxPooling2D((2, 2)))
         self.model.add(layers.Conv2D(32, (3, 3), activation='relu'))

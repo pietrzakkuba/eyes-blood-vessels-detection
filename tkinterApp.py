@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import filedialog
-# import NeuralNetwork
 import Picture
 import efficiencyevaluation
 

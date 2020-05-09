@@ -2,11 +2,8 @@ import numpy as np
 import cv2
 from random import randint, seed
 from Segment import Segment
-import sys
 import NeuralNetwork
 
-
-# imgToCut[:, :, 2]=0
 
 class Picture:
     def __init__(self, original_path, fovmask_path, target_path):
